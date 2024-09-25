@@ -7,3 +7,6 @@ TODOs:
 4. Create first version tag
 5. Replace main with master
 6. Create release label
+7. Disable squash and merge
+8. Enable feature branch auto-deletion
+9. Allow GHA to create and approve PRs ![](./images/gha.png)
