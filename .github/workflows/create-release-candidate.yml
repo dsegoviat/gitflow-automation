@@ -19,6 +19,8 @@ jobs:
           git fetch origin develop:develop
           git merge develop -Xtheirs
           git branch
+          echo "${{ github.ref }}"
+          echo "$GITHUB_CONTEXT"
       - uses: cycjimmy/semantic-release-action@v4
         id: release
         with:
