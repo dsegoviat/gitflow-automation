@@ -1,0 +1,54 @@
+name: Create Release Candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  create-github-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Merge develop into main locally
+        run: |
+          git fetch origin develop:develop
+          git merge develop -Xtheirs
+      - uses: cycjimmy/semantic-release-action@v4
+        id: release
+        with:
+            semantic_version: 24
+            ci: true
+            dry_run: true
+            extra_plugins: |
+              @semantic-release/commit-analyzer
+              @semantic-release/release-notes-generator
+              @semantic-release/github
+              conventional-changelog-conventionalcommits
+        env:
+            GITHUB_TOKEN: ${{ github.token }}
+      - name: Create release PR
+        shell: bash
+        if: steps.release.outputs.new_release_version != ''
+        run: |
+          RELEASE_VERSION=${{ steps.release.outputs.new_release_version }}
+          RELEASE_BRANCH=release/$RELEASE_VERSION
+
+          if ! git ls-remote --heads origin $RELEASE_BRANCH | grep -q 'refs/heads'; then
+            git checkout -b $RELEASE_BRANCH
+            git push origin $RELEASE_BRANCH
+          fi
+
+          if ! gh pr list --head $RELEASE_BRANCH --label "release" | grep -q $RELEASE_BRANCH; then
+            gh pr create -B main -H $RELEASE_BRANCH \
+              --title "Release v${RELEASE_VERSION}" \
+              --body '${{ steps.release.outputs.new_release_notes }}' \
+              --label release
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+      # TODO: add summary with link to PR
