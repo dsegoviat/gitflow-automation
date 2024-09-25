@@ -52,6 +52,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
+          git config --global user.email "noreply@mercedes-benz.com"
+          git config --global user.name "github-actions[bot]"
           git checkout develop
           git merge origin/main -Xours
           git push origin  HEAD:develop
