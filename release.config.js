@@ -7,14 +7,6 @@ module.exports = {
   plugins: [
     ["@semantic-release/commit-analyzer", { preset }],
     ["@semantic-release/release-notes-generator", { preset }],
-    ["@semantic-release/github"],
-    [
-      "@saithodev/semantic-release-backmerge",
-      {
-        clearWorkspace: true,
-        backmergeBranches: [{ from: "main", to: "develop" }],
-        mergeMode: "ours",
-      },
-    ],
+    ["@semantic-release/github"]
   ],
 };

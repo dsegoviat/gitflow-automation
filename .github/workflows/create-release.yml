@@ -48,6 +48,13 @@ jobs:
             GIT_AUTHOR_EMAIL: noreply@mercedes-benz.com
             GIT_COMMITTER_NAME: github-actions[bot]
             GIT_COMMITTER_EMAIL: noreply@mercedes-benz.com
+      - name: Backmerge to develop
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          git checkout develop
+          git merge origin/main -Xours
+          git push origin  HEAD:develop
       - name: Create release PR
         shell: bash
         if: github.ref == 'refs/heads/develop' && steps.release.outputs.new_release_version != ''
