@@ -9,18 +9,15 @@ permissions:
 
 jobs:
   create-release-candidate:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
       - name: Merge develop into main locally
         run: |
           git fetch origin develop:develop
           git merge develop -Xtheirs
           git branch
-          echo "${{ github.ref }}"
-          echo "$GITHUB_CONTEXT"
       - uses: cycjimmy/semantic-release-action@v4
         id: release
         with:
@@ -34,7 +31,6 @@ jobs:
               conventional-changelog-conventionalcommits
         env:
             GITHUB_TOKEN: ${{ github.token }}
-            GITHUB_REF: refs/heads/main
       - name: Create release PR
         shell: bash
         if: steps.release.outputs.new_release_version != ''
